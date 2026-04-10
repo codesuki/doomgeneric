@@ -33,7 +33,7 @@
 #else
 
 #include <strings.h>
-#include <stdbool.h>
+
 #endif
 
 
@@ -62,22 +62,20 @@
 
 #include <inttypes.h>
 
-#if defined(__cplusplus) || defined(__bool_true_false_are_defined)
+#ifdef __cplusplus
 
 // Use builtin bool type with C++.
 
-typedef unsigned char boolean;
+typedef bool boolean;
 
 #else
 
-#ifndef __bool_true_false_are_defined 
 typedef enum 
 {
     false	= 0,
     true	= 1,
 	undef	= 0xFFFFFFFF
 } boolean;
-#endif
 
 #endif
 
