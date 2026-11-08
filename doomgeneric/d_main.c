@@ -402,6 +402,8 @@ boolean D_GrabMouseCallback(void)
     return (gamestate == GS_LEVEL) && !demoplayback && !advancedemo;
 }
 
+extern void Mix_Flush();
+
 void doomgeneric_Tick()
 {
     // frame syncronous IO operations
@@ -410,6 +412,8 @@ void doomgeneric_Tick()
     TryRunTics (); // will run at least one tic
 
     S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
+
+    Mix_Flush();
 
     // Update display, next frame, with current state.
     if (screenvisible)

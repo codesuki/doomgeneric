@@ -24,8 +24,8 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <SDL.h>
-#include <SDL_mixer.h>
+// #include <SDL.h>
+// #include <SDL_mixer.h>
 
 #ifdef HAVE_LIBSAMPLERATE
 #include <samplerate.h>
@@ -41,6 +41,64 @@
 #include "z_zone.h"
 
 #include "doomtype.h"
+
+typedef uint16_t Uint16;
+typedef uint8_t Uint8;
+typedef uint32_t Uint32;
+typedef int16_t Sint16;
+typedef int bool;
+typedef struct Mix_Chunk {
+  int allocated;
+  Uint8* abuf;
+  Uint32 alen;
+  Uint8 volume; /* Per-sample volume, 0-128 */
+} Mix_Chunk;
+
+typedef struct {
+  int needed;
+  Uint16 src_format;
+  Uint16 dest_format;
+  double rate_incr;
+  Uint8* buf;
+  int len;
+  int len_cvt;
+  int len_mult;
+  double len_ratio;
+  void (*filters[10])(struct SDL_AudioCVT* cvt, Uint16 format);
+  int filter_index;
+} SDL_AudioCVT;
+
+#define SDL_INIT_AUDIO 0x00000010u
+#define MIX_MAX_VOLUME 128
+// random
+#define AUDIO_S16SYS 123
+// random
+#define SDL_VERSIONNUM 124
+
+extern int Mix_UnregisterAllEffects(int channel);
+extern int Mix_SetPanning(int channel, Uint8 left, Uint8 right);
+extern int Mix_PlayChannel(int channel, Mix_Chunk* chunk, int loops);
+extern int Mix_HaltChannel(int channel);
+extern int Mix_Playing(int channel);
+extern void Mix_CloseAudio(void);
+extern int Mix_OpenAudio(int frequency,
+			 Uint16 format,
+			 int channels,
+			 int chunksize);
+
+extern int Mix_PlayChannelTimed(int channel,
+				Mix_Chunk* chunk,
+				int loops,
+				int ticks);
+extern int Mix_AllocateChannels(int numchans);
+
+extern const char* Mix_GetError(void);
+extern int Mix_QuerySpec(int* frequency, Uint16* format, int* channels);
+
+typedef Uint32 SDL_InitFlags;
+extern void SDL_QuitSubSystem(SDL_InitFlags flags);
+extern bool SDL_Init(SDL_InitFlags flags);
+extern void SDL_PauseAudio(int pause_on);
 
 #define LOW_PASS_FILTER 1
 //#define DEBUG_DUMP_WAVS
@@ -1019,6 +1077,7 @@ static boolean I_SDL_InitSound(boolean _use_sfx_prefix)
     // version, we need to apply a workaround.  But the workaround has its
     // own drawbacks ...
 
+#if 0  // no SDL_mixer here, the kernel mixer has no such bug
     {
         const SDL_version *mixer_version;
         int v;
@@ -1039,6 +1098,7 @@ static boolean I_SDL_InitSound(boolean _use_sfx_prefix)
               "\n");
         }
     }
+#endif
 
     Mix_AllocateChannels(NUM_CHANNELS);
 
